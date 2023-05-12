@@ -18,10 +18,12 @@ namespace Folder_analiser_console_v2
                 {
                     switch (userMessage)
                     {
-                        case "/start":
-                            StartAnalising();
+                        case DefaultMessages.DirectoryModeCommand:
+                            StartAnalisingDirectories();
                             break;
-
+                        case DefaultMessages.DriveModeCommand:
+                            StartAnalisingDrives();
+                            break;
                         default:
                             Console.WriteLine("Command not found");
                             break;
@@ -30,27 +32,51 @@ namespace Folder_analiser_console_v2
 
             }
         }
-        private void StartAnalising()
+        private void StartAnalisingDirectories()
         {
             string? path = "";
 
             while (true)
             {
-                Console.WriteLine("Enter directory size:");
+                Console.WriteLine("Enter directory path:");
                 path = Console.ReadLine();
-
-                if (!CheckIsDefaultCommand(path))
+                if (CheckIsDefaultCommand(path))
                 {
-                    if (!Directory.Exists(path))
-                    {
-                        Console.WriteLine("Directory doesn't exist");
-                        continue;
-                    }
-
-                    long directorySize = FileSystemInfoProvider.GetDirectorySize(path);
-                    string userFriendlySize = ValueConverter.BytesToUserFriendly(directorySize);
-                    Console.WriteLine(userFriendlySize);
+                    return;
                 }
+
+                if (!Directory.Exists(path))
+                {
+                    Console.WriteLine("Directory doesn't exist");
+                    continue;
+                }
+
+                DirModel dirModel = FileSystemInfoProvider.CreateDirectoryTree(path);
+                Console.WriteLine(OutputConverter.DirTreeToUserFriendly(dirModel));
+            }
+        }
+
+        private void StartAnalisingDrives()
+        {
+            string? path = "";
+
+            while (true)
+            {
+                Console.WriteLine("Enter drive path:");
+                path = Console.ReadLine();
+                if (CheckIsDefaultCommand(path))
+                {
+                    return;
+                }
+
+                if (!FileSystemInfoProvider.IsDrive(path))
+                {
+                    Console.WriteLine("Drive not found");
+                    continue;
+                }
+
+                DriveModel driveModel = FileSystemInfoProvider.GetDriveModel(path);
+                Console.WriteLine(OutputConverter.DriveModelToUserFriendly(driveModel));
             }
         }
         

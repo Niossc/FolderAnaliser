@@ -6,5 +6,7 @@ public class FolderAnaliser
     {
         InputReader reader = new InputReader();
         reader.OpenMenu();
+
+        
     }
 }
